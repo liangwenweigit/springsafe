@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>登录后才可以访问的主页</h1>
+<h6 th:if="${session.containsKey(user)}">欢迎您， <span th:text="${session.user}"></span></h6><h6 th:if="${session.containsKey(user)}"><form action="/logout" method="post"><input type="submit" value="注销"></form></h6>
+<form method="post" action="/file/upload" enctype="multipart/form-data">
+    <input type="file" name="file">
+    <input type="submit" value="提交">
+</form>
+</body>
+</html>

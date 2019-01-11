@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="/images/login.css" rel='stylesheet' type='text/css'/>
+    <script src="/js/jquery.min.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="wrap">
+    <div id="header"></div>
+    <div id="content-wrap">
+        <div class="space"></div>
+        <form action="/users/loginForm"  method="post" name="forms">
+            <div class="content">
+                <div class="field">
+                    <label>账  户：</label><input id="username" name="username"
+                                              type="text" />
+                </div>
+                <div class="field">
+                    <label>密  码：</label><input id="password" name="password"
+                                              type="password" /><br />
+                </div>
+                <div class="field">
+                    <label>验证码：</label><input class="" name="checkcode"
+                                              id="checkcode" type="text" /><br />
+                </div>
+                <div class="checkphoto">
+                    <img id="codeimage" th:src="@{/images/getCheckCode}" /><a id="again">换一张</a>
+                </div>
+                <div class="checkphoto">
+                    <span id="showinfo"th:text="${msg}"></span>
+                </div>
+                <input type="checkbox" name="remember-me">记住我
+                <div class="btn">
+                    <input name="" type="button" id="check" class="login-btn" value="" />
+                </div>
+            </div>
+        </form>
+    </div>
+    <div id="footer"></div>
+</div>
+<script>
+
+    //看不清换一张
+    $("#again").bind("click", function() {
+        //这里也可以再次用ajax请求生成验证码的servlet,再请求就会重新写图片出客户端
+        //document.getElementById("codeimage").src="/web/GetCheckcodeServlet?time="+new Date(); 上下俩个功能一样
+        $("#codeimage").attr({
+            "src" : "/images/getCheckCode?time=" + new Date()
+        });
+    })
+
+    //给按钮添加点击事件
+    $("#check").bind("click",function(){
+        if ($("#checkcode").val().length == 0) {
+            $("#showinfo").html("验证码不能为空");
+            return;//记得加return結束掉  要不然还会往下执行
+        }
+        $.ajax({
+            type:"post",
+            url:"/images/checkCode",
+            data : {checkcode : $("#checkcode").val()},
+            success : function(str) {//如果返回的是success验证成功 否则失败
+                if (str == "success") {//响应提交按钮
+                    // $("#showinfo").html("验证码正确");
+                    //验证码正确就访问验证账号密码是否正确
+                    if ($("#username").val().length == 0) {
+                        $("#showinfo").html("账号不能为空");
+                        return;//记得加return結束掉  要不然还会往下执行
+                    }
+                    document.forms.submit();//提交
+                } else {//注意这是接上面的if else
+                    $("#showinfo").html("验证码输入错误");
+                    $("#codeimage").attr({//每提交一次验证过之后验证码错误的，就换一次验证码，提交通过的用户帐号密码错的也刷新验证码，防止穷举方式软件破解，提高安全
+                        "src" : "/images/getCheckCode?time=" + new Date()
+                    });
+                }
+            },
+            error:function(){
+                $("#showinfo").html("网络连接失败");
+            }
+        });
+
+    });
+
+
+    $("#checkcode").bind("blur", function() {
+        if ($("#checkcode").val().length == 0) {
+            $("#showinfo").html("验证码不能为空");
+        }
+    })
+
+    $("#checkcode").bind("focus", function() {
+        $("#showinfo").html("");
+    })
+
+    $("#username").bind("focus", function() {
+        $("#showinfo").html("");
+    })
+
+    $("#password").bind("focus", function() {
+        $("#showinfo").html("");
+    })
+
+</script>
+</body>
+</html>
