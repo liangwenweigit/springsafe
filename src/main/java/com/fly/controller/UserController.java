@@ -31,8 +31,6 @@ public class UserController {
     @RequestMapping("/invalidSession")
     public String invalidSession(HttpServletRequest request) {
         request.setAttribute("msg", "登录超时,请重新登录");
-        System.out.println("123");
-        System.out.println("123");
         return "userlogin";
     }
 
